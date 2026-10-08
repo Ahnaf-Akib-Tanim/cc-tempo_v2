@@ -27,30 +27,25 @@ statistically sound and is what the reviewers asked for ("more evaluation indexe
 ## Phase 1: data (STAGE `A`, Accelerator None; ≈1–1.5 h)
 - [x] 1.1 STAGE `A`: download Weinreb, LIANA (7 methods), build `data.pt`. 1461 progenitors confirmed.
 - [x] 1.2 LR selection reviewed: top-K raised from 64 to 128 (see PROJECT_STATUS.md).
-- [ ] 1.3 Next version: `STAGE = 'A+B+C'` with the Stage-A version attached as input. Stage A only
-      re-selects 128 pairs and rebuilds `data.pt` (≈20–30 min; no re-download); then B and C run.
+- [x] 1.3 `STAGE = 'A+B+C'` done (128 pairs, data.pt rebuilt, synthetic benchmark, timing).
 
-## Phase 2: synthetic ground truth (STAGE `B`; ≈1–2 h; cheap)
-- [ ] 2.1 STAGE `B`: `04_synthetic_benchmark.py` (β = 1.5 and β = 0, 5 models × 3 seeds).
-- [ ] 2.2 Expected:
-      - for β = 1.5, v2_meanfield has a clearly lower held-out-dose (e0.5) fate error and composition L1 than prescient/ctrl_off;
-      - the TRUE pair has the largest knockout effect (synthetic_knockouts.csv);
-      - for β = 0, there is no gain and knockout effects are ≈ 0.
-      If not, send me the CSVs before Phase 3.
+## Phase 2: synthetic ground truth: done once, re-run after the model fix
+- [x] 2.1 First run (STAGE `B`). Communication-coupled model recovers the dose effect; autonomous models
+      cannot; no false effect at β = 0. Two problems found and fixed in code: (a) exogenous doses did not
+      train (gradient was cut), (b) decoy channels had large knockout effects (channels used as hidden
+      state features) → signals are now centred on a reference field (docs/DERIVATIONS.md §1).
+- [ ] 2.2 Re-run STAGE `B` with the fixed model (part of the next version, see 3.2).
 
-## Phase 3: Weinreb main experiments (Kaggle GPU; the core of the paper)
-- [ ] 3.1 STAGE `C` timing run (50 epochs). Minutes/run ≈ (last column) × epochs / 50. If a run would take
-      > 60 min, set `train.epochs=1000` in configs/base.yaml (best-val checkpointing protects you).
-- [ ] 3.2 STAGE `D`: tier 1 (20 runs: prescient×5, v2_meanfield×5, v1×3, ctrl_off×3, ctrl_shuffled×2,
-      v2_local×2), two runs in parallel on the two T4s. If the log shows `[deadline]`, run STAGE `D` again
-      (latest version attached): finished runs are skipped and the stopped run resumes.
-- [ ] 3.3 STAGE `E`: `07_evaluate.py` → `summary.csv`, `stats_seed.csv`, `stats_bootstrap.csv`.
-- [ ] 3.4 (also STAGE `E`) `08_baselines.py` (WOT, OT-CFM, OT-CFM-SDE) → `baselines_long.csv`.
-- [ ] 3.5 (also STAGE `E`) `09_interpret.py --run v2_meanfield_s0` (≈1 h): knockouts, sender ablation, temporal windows,
-      TF perturbation, gene attribution with lineage-traced validation, signal→TF, bifurcation.
-- [ ] 3.6 Pack, download, send me. **Decision point:** if v2_meanfield does not beat prescient and the controls,
-      we write the honest version (communication helps on cytokine and synthetic data, and is neutral in
-      constant medium). The cytokine evidence carries the paper either way.
+## Phase 3: Weinreb main experiments (the core of the paper)
+- [x] 3.1 Timing (STAGE `C`): 50 epochs = 0.30 min (PRESCIENT), 0.47 min (v2). So runs use 2,500 epochs
+      (as in v1): ~15–24 min training + ~10 min evaluation per run.
+- [ ] 3.2 **Next version: `STAGE = 'B+D+E'`** (attach the A+B+C version as input). Expected ≈ 8–9 h:
+      B (synthetic, ~1 h) → D (tier 1: 20 runs on both GPUs, ~5 h) → E (tables, baselines,
+      interpretation, ~2 h). If the log shows `[deadline]`, run `STAGE = 'D+E'` again with the newest
+      version attached; finished runs are skipped.
+- [ ] 3.3 Send me `cct_outputs.zip`. **Decision point:** if v2_meanfield does not beat prescient and the
+      controls, we write the honest version (communication matters when signals vary: cytokine and
+      synthetic evidence carry the paper).
 
 ## Phase 4: cytokine perturbation (Kaggle; strongest biological evidence)
 - [ ] 4.1 `10_cytokine_experiments.py --evidence` (already run locally: results in

@@ -69,6 +69,10 @@ class CCTempo(nn.Module):
         if self.context is False:  # YAML reads a bare `off` as boolean False
             self.context = "off"
         self.grad_through_receptor = bool(mcfg.get("grad_through_receptor", True))
+        # centre the field on a reference (the observed start population): channels then carry only
+        # *changes* in signalling, so they cannot act as hidden state features, and a knockout
+        # (gate = 0) means "clamp this channel at its reference level" (an in-distribution input)
+        self.center_field = bool(mcfg.get("center_field", True))
         self.x_dim = x_dim
         hidden = int(mcfg.get("hidden", 500))
         self.phi = PotentialMLP(x_dim, hidden, int(mcfg.get("layers", 1)), mcfg.get("activation", "softplus"))
@@ -96,6 +100,7 @@ class CCTempo(nn.Module):
             s_dim = 2 * self.K if self.mode == "local" else self.K
             self.cpot = FiLMPotential(x_dim, s_dim, int(mcfg.get("c_hidden", 256)), mcfg.get("activation", "softplus"))
             self.register_buffer("s_scale", torch.ones(s_dim))
+            self.register_buffer("f_ref", torch.zeros(self.K))
             self.register_buffer("ko_mask", torch.ones(self.K))   # ligand-receptor knockouts (receiver side)
             self.register_buffer("rec_mask", torch.ones(self.K))  # receptor knockouts
             exo = lr.get("exogenous", [None] * self.K)
@@ -151,21 +156,30 @@ class CCTempo(nn.Module):
             s = torch.cat([g * l, g * r * self.rec_mask], dim=1)
         else:
             r = self.lr.receptor(xr) * self.rec_mask
-            s = g * field[None, :] * r
+            f = field - self.f_ref if self.center_field else field
+            s = g * f[None, :] * r
         return s / self.s_scale
 
     @torch.no_grad()
-    def calibrate(self, x, w=None):
-        """Set per-channel signal scales so that typical received signals are O(1)."""
+    def calibrate(self, x, w=None, x_by_time=None):
+        """Set the reference field and per-channel scales so that typical received signals are O(1).
+
+        x: pooled cells (any times); x_by_time: list of per-time cell tensors, first = start time."""
         if self.mode not in ("local", "meanfield"):
             return
         l, r = self.lr(x)
         if self.mode == "local":
             sc = torch.cat([l.mean(0), r.mean(0)])
         else:
-            L = self.ligand_field(x, w)
-            endo = L * r.mean(0)
-            exo = r.mean(0)  # reference exogenous level = 1 log-expression unit
+            rm = r.mean(0)
+            exo = rm  # reference exogenous level = 1 log-expression unit
+            if self.center_field and x_by_time:
+                fields = torch.stack([self.ligand_field(xt) for xt in x_by_time])
+                self.f_ref.copy_(fields[0])
+                dev = (fields - fields[0]).abs().max(0).values
+                endo = (dev + 0.05 * fields[0] + 1e-3) * rm
+            else:
+                endo = self.ligand_field(x, w) * rm
             sc = torch.where(self.exo_flag, torch.maximum(endo, exo), endo)
         self.s_scale.copy_(sc.clamp_min(1e-4))
 
@@ -193,7 +207,9 @@ class CCTempo(nn.Module):
             if self.mode == "local":
                 s = self.signal(x)
             elif self.mode == "meanfield":
-                s = self.signal(x, field.detach() if field is not None else None)
+                # the field reaches here without dependence on particle positions (see simulate), so it
+                # keeps its gradient w.r.t. parameters (exogenous doses) but creates no 'sender force'
+                s = self.signal(x, field)
             U = self.potential(x, y, s)
             grads = torch.autograd.grad(U.sum(), inputs, create_graph=create_graph)
         vx = -grads[0]
@@ -229,11 +245,15 @@ def build_model(mcfg: dict, data: dict, device="cpu", calibrate=True):
     x_dim = int(data["x"][0].shape[1])
     model = CCTempo(mcfg, x_dim, data).to(device)
     if calibrate and model.mode in ("local", "meanfield"):
-        xs = torch.cat([t.float() for t in data["x"]], 0)
-        if xs.shape[0] > 20000:
-            idx = torch.randperm(xs.shape[0], generator=torch.Generator().manual_seed(0))[:20000]
-            xs = xs[idx]
-        model.calibrate(xs.to(device))
+        gen = torch.Generator().manual_seed(0)
+
+        def _sub(t, n):
+            t = t.float()
+            return t[torch.randperm(t.shape[0], generator=gen)[:n]] if t.shape[0] > n else t
+
+        xs = _sub(torch.cat([t.float() for t in data["x"]], 0), 20000)
+        per_time = [_sub(t, 8000).to(device) for t in data["x"]]
+        model.calibrate(xs.to(device), x_by_time=per_time)
     return model
 
 

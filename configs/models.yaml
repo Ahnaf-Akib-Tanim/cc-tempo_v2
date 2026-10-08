@@ -7,3 +7,5 @@ ctrl_off:       {mode: meanfield, context: "off"}    # same architecture/capacit
 ctrl_shuffled:  {mode: meanfield, context: shuffled}  # receptors re-paired at random
 ctrl_random:    {mode: meanfield, context: random}    # random genes in place of LR genes
 v2_mf_nogradR:  {mode: meanfield, grad_through_receptor: false}  # ablation: signal as landscape parameter only
+v2_mf_uncentered: {mode: meanfield, center_field: false}  # ablation: raw (uncentred) field, as in the first synthetic run
+v2_mf_sparse:   {mode: meanfield, gate_l1: 0.05}   # stronger gate sparsity (tested on synthetic decoys)

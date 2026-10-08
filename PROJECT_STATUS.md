@@ -147,10 +147,36 @@ ctrl_off, ctrl_shuffled, ctrl_random.
         scoring family, not by name.
       Outputs: `kaggle/cct_outputs_stage A/`.
 
+- [x] **Stages A+B+C on Kaggle (2026-10-08):** data rebuilt with 128 LR pairs (68 families).
+      *Timing (T4):* 50 epochs = 0.30 min PRESCIENT / 0.47 min v2 → 2,500 epochs per run is affordable.
+      *Synthetic benchmark (3 seeds; P(fate A) at t = 3; truth e0/e0.5/e1 = 0.455/0.127/0.032 at β = 1.5):*
+      | model | e0 | e0.5 (held out) | e1 |
+      |---|---|---|---|
+      | PRESCIENT | 0.137 | 0.137 | 0.137 |
+      | CC-off | 0.134 | 0.134 | 0.134 |
+      | v2-local | 0.153 | 0.153 | 0.153 |
+      | **v2-meanfield** | **0.445** | 0.048 | **0.015** |
+      | shuffled-LR control | 0.467 | 0.128 | 0.035 |
+      At β = 0 (no true communication) v2-meanfield predicts no dose effect (0.53 at all doses; truth 0.51).
+      Problems found: (a) exogenous dose parameters never trained (gradient cut in the simulator: fixed);
+      (b) decoy LR channels had larger knockout effects than the true channel, even at β = 0, i.e.
+      channels were used as hidden state features → fixed by centring signals on a reference field
+      (knockout = clamp at reference); (c) the shuffled control matches v2 here because, in this toy,
+      the exogenous input alone identifies the condition; receptor identity is tested on real data.
+      Outputs: `kaggle/cct_outputs_stage a+b+c/`.
+- [x] **Fix verified on CPU (1 seed, β = 1.5):** dose now trains (1.0 → 2.15); held-out dose predicted
+      correctly (P(A) 0.122 vs truth 0.127; before the fix 0.048). Knockouts: with the dose applied the TRUE
+      channel dominates (1.56 vs decoys ≤ 0.31); without a dose decoys still outrank it (0.77 vs 0.08).
+      Interpretation for the paper: in one unperturbed time course, every ligand whose population level
+      changes over time is confounded with the true one; perturbation (exogenous dose) identifies the
+      channel. Knockout rankings from Weinreb alone are hypotheses; the cytokine data provide the causal test.
+      Added `v2_mf_sparse` (stronger gate L1) and `v2_mf_uncentered` (ablation) to the synthetic benchmark.
+
 **Left (in order; details in TODO_PLAN.md)**
 - [x] GitHub repo created and code pushed
 - [x] Phase 0–1: Kaggle setup; Weinreb data prep (STAGE `A`)
-- [ ] Re-run STAGE `A` (128 LR pairs: cheap rebuild) together with `B` and `C` → `STAGE = 'A+B+C'`
+- [x] STAGE `A+B+C`
+- [ ] Next: `STAGE = 'B+D+E'` (synthetic re-run with fixed model, Weinreb tier 1, tables/baselines/interpretation)
 - [ ] Phase 2: full synthetic benchmark (β = 1.5 and 0, 3 seeds)
 - [ ] Phase 3: Weinreb tier 1 (20 runs) + evaluation + baselines + interpretation
 - [ ] Phase 4: cytokine models (joint + leave-one-medium-out) + dose-response; **verify cocktail composition**

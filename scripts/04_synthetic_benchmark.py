@@ -45,7 +45,7 @@ for beta in sc["betas"]:
     if not os.path.exists(dpath):
         save_data(make_synthetic(beta=beta, doses=tuple(sc["doses"]), n_cells=sc["n_cells"] if not args.quick else 600), dpath)
     tag_over = over + [f"paths.data_pt={base['paths']['work']}/data_beta{beta}.pt",
-                       f"paths.runs={base['paths']['work']}/runs_beta{beta}"]
+                       f"paths.runs={base['paths']['work']}/runs_c_beta{beta}"]
     for preset in models:
         for s in seeds:
             out = train_one(cfgp, preset, s, args.root, dev, tag_over)
@@ -58,17 +58,20 @@ for beta in sc["betas"]:
                 tf = res["dist"].get(cond, {}).get("3.0", {})
                 row.update({"w2_t3": tf.get("w2"), "comp_l1_t3": tf.get("l1")})
                 rows.append(row)
-            if preset == "v2_meanfield":
+            if preset in ("v2_meanfield", "v2_mf_sparse", "v2_mf_uncentered", "ctrl_shuffled"):
                 cfg = make_cfg(cfgp, preset, tag_over)
                 data = load_dataset(cfg, args.root)
                 model, _ = load_run_model(out, data, dev)
                 clf = classifier_for(cfg, data, args.root)
                 gt = data["eval"]["synthetic"]["e0.0"]
-                runner = FateRunner(model, data, clf, gt["prog_idx"][:150], 0.0, 3.0, n_copies=50 if not args.quick else 10,
-                                    n_bg=1000, pos="A", neg="B", device=dev)
-                ko = lr_knockout_scan(runner, level="family")
-                ko["beta"], ko["seed"] = beta, s
-                ko_rows.append(ko)
+                for cond, exo in (("e0.0", {}), ("e1.0", {"EXO": 1.0})):
+                    e = model.exogenous_field(exo).detach()
+                    runner = FateRunner(model, data, clf, gt["prog_idx"][:150], 0.0, 3.0,
+                                        n_copies=50 if not args.quick else 10, n_bg=1000, pos="A", neg="B",
+                                        device=dev, exog_fn=lambda t, e=e: e)
+                    ko = lr_knockout_scan(runner, level="family")
+                    ko["beta"], ko["seed"], ko["model"], ko["condition"] = beta, s, preset, cond
+                    ko_rows.append(ko)
 res_dir = os.path.join(args.root, base["paths"]["results"])
 os.makedirs(res_dir, exist_ok=True)
 df = pd.DataFrame(rows)

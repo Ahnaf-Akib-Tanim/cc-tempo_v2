@@ -165,7 +165,7 @@ class Trainer:
             wr.writerow(["epoch", "train_loss", "val_train_times", "val_holdout", "gate_mean", "minutes"])
         eval_every = int(self.t.get("eval_every", 50))
         save_every = int(self.t.get("save_every", 100))
-        lam = float(self.t.get("gate_l1", 0.0))
+        lam = float(self.mcfg.get("gate_l1", self.t.get("gate_l1", 0.0)))  # a model preset may override
         clip = float(self.t.get("clip", 0.25))
         stopped_early = False
         for epoch in range(start, epochs):

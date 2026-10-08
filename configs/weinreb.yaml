@@ -26,6 +26,7 @@ prepare:
 train:
   start_time: 2.0
   train_times: [4.0, 6.0]
+  epochs: 2500                         # as in the v1 paper; T4 timing: ~15 min (PRESCIENT) / ~24 min (v2) per run
 
 eval:
   start_time: 2.0

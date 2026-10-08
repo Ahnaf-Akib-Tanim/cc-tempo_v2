@@ -11,7 +11,7 @@ synthetic:
   n_cells: 3000
   train_conditions: [e0.0, e1.0]  # held-out dose e0.5 tests interpolation of the signal
   seeds: [0, 1, 2]
-  models: [prescient, ctrl_off, v2_local, v2_meanfield, ctrl_shuffled]
+  models: [prescient, ctrl_off, v2_local, v2_meanfield, ctrl_shuffled, v2_mf_sparse, v2_mf_uncentered]
 
 model:
   hidden: 128

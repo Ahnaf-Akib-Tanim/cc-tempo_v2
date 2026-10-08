@@ -44,7 +44,8 @@ def simulate(model, x0, t0, t1, dt, y0=None, w0=None, growth=None, field_traj=No
                 w = w0 * torch.exp(growth * (t - t0)) if growth is not None else w0
                 if field_weight_fn is not None:
                     w = w * field_weight_fn(x.detach())
-                endo = model.ligand_field(x if create_graph else x.detach(), w)
+                # positions are detached: no 'sender force', but parameters (gates, doses) still get gradients
+                endo = model.ligand_field(x.detach(), w)
             field = _alpha_at(alpha_fn, t, dev) * endo
             if exog_fn is not None:
                 field = field + exog_fn(t)

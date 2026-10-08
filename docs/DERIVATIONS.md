@@ -25,13 +25,20 @@ metric. That is why we fit U by matching simulated and observed snapshots with a
 on the signal it receives from the population:
 
   dx_i = −∇_x U(x_i ; s_i(t)) dt + σ dW_i,
-  s_ik(t) = g_k · ( α L_k(μ_t) + e_k(t) ) · r_k(x_i) / c_k,
+  s_ik(t) = g_k · ( α L_k(μ_t) + e_k(t) − L_k^ref ) · r_k(x_i) / c_k,
   L_k(μ_t) = ∫ l_k(y) w_t(y) μ_t(dy) / ∫ w_t dμ_t                   (2)
 
 - l_k and r_k are the ligand and receptor expression of LR pair k. They are decoded from x, and a complex is the soft-min of its subunits, as in LIANA/CellPhoneDB.
 - w_t is the growth weight.
 - e_k(t) is an exogenous ligand (cytokine in the medium, SAG).
 - g_k ∈ (0,1) is a learned gate initialised from the LIANA consensus prior.
+- L_k^ref is the field of the observed start population (reference). Centring is no loss of
+  generality, because the term g_k L_k^ref r_k(x) depends on x only and is absorbed by Φ. It
+  matters for identifiability: a channel can affect dynamics only through *changes* in the ligand
+  field (over time, with population composition, or with the medium), so it cannot serve as a hidden
+  description of the cell's own state. A knockout (g_k = 0) then means "clamp channel k at its
+  reference level", an input the model has seen. Without centring, the first synthetic benchmark
+  showed decoy channels with knockout effects larger than the true channel.
 - c_k is a fixed calibration constant.
 
 Because L_k depends on μ_t, (2) is a McKean–Vlasov SDE. As N → ∞ the interacting system becomes a
