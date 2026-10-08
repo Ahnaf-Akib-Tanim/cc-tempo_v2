@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cctempo"
+version = "2.0.0.dev0"
+description = "CC-Tempo v2: cell-cell communication aware, mean-field temporal model of cellular dynamics"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = [
+  "numpy",
+  "scipy",
+  "pandas",
+  "scikit-learn",
+  "torch>=1.13",
+  "pyyaml",
+  "tqdm",
+]
+
+[project.optional-dependencies]
+sc = ["scanpy>=1.9", "anndata", "liana>=1.0", "pot>=0.9", "geomloss", "captum", "decoupler", "umap-learn", "matplotlib", "seaborn"]
+app = ["gradio>=4", "matplotlib"]
+dev = ["pytest"]
+
+[project.scripts]
+cctempo = "cctempo.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["cctempo*"]

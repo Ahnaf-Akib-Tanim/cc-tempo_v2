@@ -1,0 +1,49 @@
+# Run plan. Each entry -> one training run. `06_run_grid.py --tier 1` runs tier-1 entries in order
+# and skips finished ones, so you can split work across Kaggle sessions / accounts freely.
+# Budget note: ~25 GPU runs is the target for tier 1 (Weinreb main table). Calibrate minutes/run
+# with the timing step in TODO_PLAN.md and trim seeds if needed (keep >= 3 seeds per row).
+
+weinreb:
+  config: weinreb.yaml
+  tier1:          # main table + communication evidence (20 runs)
+    - {preset: prescient,     seeds: [0, 1, 2, 3, 4]}
+    - {preset: v2_meanfield,  seeds: [0, 1, 2, 3, 4]}
+    - {preset: v1,            seeds: [0, 1, 2]}
+    - {preset: ctrl_off,      seeds: [0, 1, 2]}
+    - {preset: ctrl_shuffled, seeds: [0, 1]}
+    - {preset: v2_local,      seeds: [0, 1]}
+  tier2:          # robustness to the CCC method (Reviewer 1c) + controls + interpolation
+    - {preset: v2_meanfield, seeds: [0, 1], lr_method: cellphonedb, tag: cellphonedb}
+    - {preset: v2_meanfield, seeds: [0, 1], lr_method: cellchat,    tag: cellchat}
+    - {preset: v2_meanfield, seeds: [0, 1], lr_method: natmi,       tag: natmi}
+    - {preset: v2_meanfield, seeds: [0, 1], lr_method: connectome,  tag: connectome}
+    - {preset: ctrl_random,  seeds: [0, 1]}
+    - {preset: prescient,    seeds: [0, 1], tag: hold4, set: ["train.holdout_times=[4.0]"]}
+    - {preset: v2_meanfield, seeds: [0, 1], tag: hold4, set: ["train.holdout_times=[4.0]"]}
+  tier3:
+    - {preset: v2_mf_nogradR, seeds: [0, 1]}
+    - {preset: v2_meanfield,  seeds: [5, 6, 7, 8, 9]}
+    - {preset: prescient,     seeds: [5, 6, 7, 8, 9]}
+
+cytokine:
+  config: cytokine.yaml
+  tier1:          # all conditions jointly
+    - {preset: prescient,    seeds: [0, 1]}
+    - {preset: v2_meanfield, seeds: [0, 1, 2]}
+  tier2:          # leave-one-condition-out (train on 4 media, predict the 5th)
+    - {preset: v2_meanfield, seeds: [0], tag: loco_Mcsf, set: ["train.conditions=[full cocktail,G-csf,Epo,SCF]"]}
+    - {preset: v2_meanfield, seeds: [0], tag: loco_Gcsf, set: ["train.conditions=[full cocktail,M-csf,Epo,SCF]"]}
+    - {preset: v2_meanfield, seeds: [0], tag: loco_Epo,  set: ["train.conditions=[full cocktail,M-csf,G-csf,SCF]"]}
+    - {preset: prescient,    seeds: [0], tag: loco_Mcsf, set: ["train.conditions=[full cocktail,G-csf,Epo,SCF]"]}
+    - {preset: prescient,    seeds: [0], tag: loco_Gcsf, set: ["train.conditions=[full cocktail,M-csf,Epo,SCF]"]}
+    - {preset: ctrl_shuffled, seeds: [0], tag: loco_Gcsf, set: ["train.conditions=[full cocktail,M-csf,Epo,SCF]"]}
+
+neural_tube:
+  config: neural_tube.yaml
+  tier1:
+    - {preset: prescient,    seeds: [0, 1]}
+    - {preset: v2_meanfield, seeds: [0, 1, 2]}
+  tier2:
+    - {preset: ctrl_off,     seeds: [0, 1]}
+    - {preset: prescient,    seeds: [0], tag: holdlast, set: ["train.holdout_times=[LAST]"]}
+    - {preset: v2_meanfield, seeds: [0], tag: holdlast, set: ["train.holdout_times=[LAST]"]}

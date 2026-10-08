@@ -1,0 +1,42 @@
+inherit: base.yaml
+name: synthetic
+paths:
+  work: work/synthetic
+  runs: work/synthetic/runs
+  results: work/synthetic/results
+
+synthetic:
+  betas: [1.5, 0.0]              # true coupling strength; 0.0 = autonomous control
+  doses: [0.0, 0.5, 1.0]
+  n_cells: 3000
+  train_conditions: [e0.0, e1.0]  # held-out dose e0.5 tests interpolation of the signal
+  seeds: [0, 1, 2]
+  models: [prescient, ctrl_off, v2_local, v2_meanfield, ctrl_shuffled]
+
+model:
+  hidden: 128
+  c_hidden: 64
+
+train:
+  start_time: 0.0
+  dt: 0.1
+  epochs: 400
+  batch_frac: 0.5
+  max_batch: 1500
+  eval_every: 25
+  save_every: 50
+  conditions: [e0.0, e1.0]
+  condition_cytokines:
+    e0.0: {}
+    e0.5: {EXO: 0.5}
+    e1.0: {EXO: 1.0}
+
+eval:
+  start_time: 0.0
+  end_time: 3.0
+  conditions: [e0.0, e0.5, e1.0]
+  n_copies: 200
+  n_bg: 1500
+  pos: A
+  neg: B
+  pathint: {n_points: 3000, dims: 10, k: 30, tau: 0.5}

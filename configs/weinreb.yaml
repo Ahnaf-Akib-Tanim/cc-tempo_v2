@@ -1,0 +1,35 @@
+inherit: base.yaml
+name: weinreb
+paths:
+  raw: raw/weinreb                     # downloads (relative to --root)
+  work: work/weinreb                   # processed files
+  h5ad: work/weinreb/weinreb_log.h5ad
+  liana: work/weinreb/liana_table.csv.gz
+  data_pt: work/weinreb/data.pt
+  runs: work/weinreb/runs
+  results: work/weinreb/results
+
+prepare:
+  kind: invitro
+  time_key: Time point
+  celltype_key: Cell type annotation
+  n_hvg: 2500
+  n_pcs: 50
+  val_frac: 0.1
+  liana_methods: [rank_aggregate, cellphonedb, cellchat, natmi, connectome, singlecellsignalr, geometric_mean]
+  liana_resource: mouseconsensus
+  liana_max_cells_per_group: 1500
+  lr_top_k: 64
+  lr_method: rank_aggregate            # the consensus; other methods give data variants for robustness
+  force_cytokines: []                  # in vitro: no medium perturbation modelled
+
+train:
+  start_time: 2.0
+  train_times: [4.0, 6.0]
+
+eval:
+  start_time: 2.0
+  end_time: 6.0
+  pos: Neutrophil
+  neg: Monocyte
+  undiff: Undifferentiated

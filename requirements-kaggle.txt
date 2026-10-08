@@ -1,0 +1,13 @@
+# Installed on top of the Kaggle GPU image (torch, numpy, scipy, pandas, sklearn are preinstalled).
+scanpy>=1.9
+anndata
+liana>=1.0
+pot>=0.9
+geomloss
+captum
+decoupler
+umap-learn
+pyyaml
+tqdm
+matplotlib
+seaborn

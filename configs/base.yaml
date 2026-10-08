@@ -1,0 +1,43 @@
+# Defaults shared by every dataset. Dataset configs `inherit: base.yaml` and override.
+model:
+  mode: meanfield          # prescient | v1 | local | meanfield   (see configs/models.yaml presets)
+  hidden: 500              # PRESCIENT / v1 default
+  layers: 1
+  activation: softplus
+  c_hidden: 256            # communication-conditioned landscape width
+  sigma: 0.5               # diffusion; x += v dt + sigma sqrt(dt) z
+  context: lr              # lr | off | shuffled | random   (negative controls)
+  gate_init: prior         # prior | uniform
+  grad_through_receptor: true
+  softmin_tau: 0.1
+
+train:
+  dt: 0.1
+  epochs: 1500             # v1 paper used 2500 (+500 pretrain); 1500 + best-val checkpointing is enough
+  lr: 0.01
+  batch_frac: 0.1          # 10% of cells per epoch, as in the paper
+  max_batch: 3000
+  clip: 0.25
+  sched_step: 100
+  sched_gamma: 0.9
+  gate_l1: 0.001
+  eval_every: 50
+  save_every: 100
+  blur: 0.1
+  scaling: 0.7
+  max_minutes: 660         # stop cleanly before Kaggle's 12 h limit; rerun the same command to resume
+  resume: true
+  holdout_times: []
+
+eval:
+  dt: 0.1
+  n_copies: 2000           # copies per progenitor (the paper's Methods value)
+  n_bg: 5000               # background population for the mean-field ligand field
+  max_particles: 200000    # GPU memory knob for MC simulation
+  ko_copies: 200           # copies per progenitor for knockout scans (paired, common random numbers)
+  pathint:
+    n_points: 8000
+    dims: 30
+    n_paths: 32
+    k: 40
+    tau: 0.5

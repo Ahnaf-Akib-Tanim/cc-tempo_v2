@@ -1,0 +1,12 @@
+raw/
+work/*/runs/
+work/*/*.h5ad
+work/*/*.pt
+work/*/*.pkl
+work/*/clones.npz
+__pycache__/
+*.pyc
+*.egg-info/
+.ipynb_checkpoints/
+cct_outputs.zip
+cct_app_result.csv

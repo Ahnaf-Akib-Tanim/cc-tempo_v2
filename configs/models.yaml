@@ -1,0 +1,9 @@
+# Model presets (merged into the `model:` section). Names are used by scripts/06_run_grid.py.
+prescient:      {mode: prescient}
+v1:             {mode: v1}                         # faithful original CC-Tempo (additive, decoupled)
+v2_local:       {mode: local}                      # cell-intrinsic LR coupling
+v2_meanfield:   {mode: meanfield}                  # population (mean-field) LR coupling  <- main model
+ctrl_off:       {mode: meanfield, context: "off"}    # same architecture/capacity, signal = 0
+ctrl_shuffled:  {mode: meanfield, context: shuffled}  # receptors re-paired at random
+ctrl_random:    {mode: meanfield, context: random}    # random genes in place of LR genes
+v2_mf_nogradR:  {mode: meanfield, grad_through_receptor: false}  # ablation: signal as landscape parameter only

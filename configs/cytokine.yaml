@@ -1,0 +1,47 @@
+inherit: base.yaml
+name: cytokine
+paths:
+  raw: raw/weinreb_cytokine
+  work: work/cytokine
+  h5ad: work/cytokine/cytokine_log.h5ad
+  liana: work/cytokine/liana_table.csv.gz
+  data_pt: work/cytokine/data.pt
+  runs: work/cytokine/runs
+  results: work/cytokine/results
+
+prepare:
+  kind: cytokine
+  time_key: Time point
+  celltype_key: Cell type annotation
+  condition_key: Cytokine condition
+  n_hvg: 2500
+  n_pcs: 50
+  val_frac: 0.1
+  liana_methods: [rank_aggregate]
+  liana_resource: mouseconsensus
+  liana_max_cells_per_group: 1500
+  lr_top_k: 64
+  lr_method: rank_aggregate
+  force_cytokines: [M-csf, G-csf, Epo, SCF, GM-csf, IL-3, IL-6, TPO, Flt3L]
+
+train:
+  start_time: 2.0
+  train_times: [4.0, 6.0]
+  start_condition: null          # Day-2 cells are shared (all labelled 'full cocktail' before replating)
+  conditions: [full cocktail, M-csf, G-csf, Epo, SCF]
+  # !!! VERIFY the full-cocktail composition in Weinreb et al. 2020 (Methods, cytokine perturbation).
+  # The single-cytokine arms are taken from the metadata labels.
+  condition_cytokines:
+    full cocktail: [SCF, Flt3L, IL-3, IL-6, TPO, Epo, GM-csf, M-csf, G-csf]
+    M-csf: [M-csf]
+    G-csf: [G-csf]
+    Epo: [Epo]
+    SCF: [SCF]
+
+eval:
+  start_time: 2.0
+  end_time: 6.0
+  pos: Neu
+  neg: Mo
+  undiff: Undifferentiated
+  conditions: [full cocktail, M-csf, G-csf, Epo, SCF]

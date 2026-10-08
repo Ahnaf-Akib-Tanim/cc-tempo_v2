@@ -1,0 +1,10 @@
+# Hugging Face Space (CPU) requirements
+torch
+numpy
+scipy
+pandas
+scikit-learn
+pyyaml
+tqdm
+gradio>=4
+matplotlib

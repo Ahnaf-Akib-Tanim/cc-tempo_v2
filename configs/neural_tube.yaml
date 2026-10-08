@@ -1,0 +1,36 @@
+inherit: base.yaml
+name: neural_tube
+paths:
+  raw: raw/neural_tube
+  work: work/neural_tube
+  h5ad: work/neural_tube/nt_log.h5ad
+  liana: work/neural_tube/liana_table.csv.gz
+  data_pt: work/neural_tube/data.pt
+  runs: work/neural_tube/runs
+  results: work/neural_tube/results
+
+prepare:
+  time_key: auto                 # detected from obs (timepoint/day/...); see 11_neural_tube.py --inspect
+  celltype_key: auto             # existing annotation if found, otherwise marker-based
+  n_hvg: 2000
+  n_pcs: 30
+  val_frac: 0.1
+  min_counts: 1000
+  liana_methods: [rank_aggregate]
+  liana_resource: mouseconsensus
+  liana_max_cells_per_group: 1500
+  lr_top_k: 48
+  lr_method: rank_aggregate
+  force_cytokines: [SAG]         # SAG 500 nM in the medium from Day 3 (exogenous Smo input)
+  # PNAS-comparable gene panel (Cislo et al. 2025, RNA test): KL-in-bits is also reported here
+  pnas_genes: [Gm32061, Gpm6b, Glra1, Nav2, Sox9, Nkx2-2, Gm38103, Neurog2, Olig2, Nkx2-9, Slc2a1, Slit3, Slit2, Shh, Foxa2, Spon1, Slit1]
+
+train:
+  conditions: [SAG]
+  condition_cytokines:
+    SAG: [SAG]
+  start_condition: null
+
+eval:
+  pos: FP
+  neg: p3
