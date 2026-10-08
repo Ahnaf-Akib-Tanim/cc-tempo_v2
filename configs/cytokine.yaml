@@ -20,7 +20,7 @@ prepare:
   liana_methods: [rank_aggregate]
   liana_resource: mouseconsensus
   liana_max_cells_per_group: 1500
-  lr_top_k: 64
+  lr_top_k: 128
   lr_method: rank_aggregate
   force_cytokines: [M-csf, G-csf, Epo, SCF, GM-csf, IL-3, IL-6, TPO, Flt3L]
 

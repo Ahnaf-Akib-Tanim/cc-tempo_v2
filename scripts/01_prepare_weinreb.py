@@ -15,10 +15,15 @@ from cctempo.data.weinreb import clonal_fate_bias, load_anndata
 from cctempo.runner import P
 from cctempo.utils import load_config, save_json
 
-args = _common.parser(__doc__, "weinreb.yaml").parse_args()
+p = _common.parser(__doc__, "weinreb.yaml")
+p.add_argument("--force", action="store_true", help="redo even if the outputs already exist")
+args = p.parse_args()
 cfg = load_config(_common.cfg_path(args.config), args.set)
 pc = cfg["prepare"]
 os.makedirs(P(cfg, "work", args.root), exist_ok=True)
+if not args.force and os.path.exists(P(cfg, "h5ad", args.root)) and         os.path.exists(os.path.join(P(cfg, "work", args.root), "clonal_targets.pkl")):
+    print("[skip] normalised h5ad and clonal targets already exist (use --force to redo)")
+    raise SystemExit(0)
 
 adata = load_anndata(pc["kind"], P(cfg, "raw", args.root))
 print(adata)

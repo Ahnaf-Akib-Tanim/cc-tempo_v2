@@ -16,7 +16,8 @@ weinreb:
     - {preset: v2_meanfield, seeds: [0, 1], lr_method: cellphonedb, tag: cellphonedb}
     - {preset: v2_meanfield, seeds: [0, 1], lr_method: cellchat,    tag: cellchat}
     - {preset: v2_meanfield, seeds: [0, 1], lr_method: natmi,       tag: natmi}
-    - {preset: v2_meanfield, seeds: [0, 1], lr_method: connectome,  tag: connectome}
+    # connectome / geometric_mean / singlecellsignalr rank LR pairs exactly like natmi (same
+    # expression-product magnitude; Jaccard 1.0 in Stage A), so they are not run separately.
     - {preset: ctrl_random,  seeds: [0, 1]}
     - {preset: prescient,    seeds: [0, 1], tag: hold4, set: ["train.holdout_times=[4.0]"]}
     - {preset: v2_meanfield, seeds: [0, 1], tag: hold4, set: ["train.holdout_times=[4.0]"]}

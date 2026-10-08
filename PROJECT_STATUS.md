@@ -136,9 +136,21 @@ ctrl_off, ctrl_shuffled, ctrl_random.
 - [x] cytokine clone-matched evidence (final numbers)
 - [x] docs: derivations, audit, novelty, user/Kaggle guides, response draft, manuscript outline, TODO plan
 
+- [x] **Stage A on Kaggle (2026-10-08):** Weinreb downloaded and normalised (130,887 cells × 25,289 genes;
+      1,461 benchmark progenitors, matching the local check); LIANA ran 7 methods × 3 time points
+      (156,702 rows). Findings:
+      - with 64 pairs the selection missed known axes (Cxcl5→Cxcr2, Il6, Ccl4→Ccr1, Tnf→Tnfrsf1a), so
+        top-K was raised to 128 (68 ligand families); Cd34→Sell (v1's top pathway) ranks 138th;
+      - NATMI, Connectome, geometric mean and SingleCellSignalR give identical top-K sets (Jaccard 1.0,
+        all use the ligand×receptor expression product). CellChat vs those 0.87; CellPhoneDB 0.62–0.70;
+        consensus vs single methods 0.33–0.35. Use this in the Reviewer 1(c) reply: methods differ by
+        scoring family, not by name.
+      Outputs: `kaggle/cct_outputs_stage A/`.
+
 **Left (in order; details in TODO_PLAN.md)**
 - [x] GitHub repo created and code pushed
-- [ ] Phase 0–1: Kaggle setup; Weinreb data prep (STAGE `A`)
+- [x] Phase 0–1: Kaggle setup; Weinreb data prep (STAGE `A`)
+- [ ] Re-run STAGE `A` (128 LR pairs: cheap rebuild) together with `B` and `C` → `STAGE = 'A+B+C'`
 - [ ] Phase 2: full synthetic benchmark (β = 1.5 and 0, 3 seeds)
 - [ ] Phase 3: Weinreb tier 1 (20 runs) + evaluation + baselines + interpretation
 - [ ] Phase 4: cytokine models (joint + leave-one-medium-out) + dose-response; **verify cocktail composition**

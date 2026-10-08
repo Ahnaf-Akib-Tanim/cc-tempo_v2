@@ -10,3 +10,5 @@ __pycache__/
 .ipynb_checkpoints/
 cct_outputs.zip
 cct_app_result.csv
+kaggle/cct_outputs*/
+kaggle/*.zip

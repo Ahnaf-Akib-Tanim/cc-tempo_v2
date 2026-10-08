@@ -25,9 +25,10 @@ statistically sound and is what the reviewers asked for ("more evaluation indexe
       The notebook always pulls the latest code.
 
 ## Phase 1: data (STAGE `A`, Accelerator None; ≈1–1.5 h)
-- [ ] 1.1 STAGE `A`: download Weinreb, LIANA (7 methods), build `data.pt`.
-      Check in the log: **1461** progenitors (I verified this number locally).
-- [ ] 1.2 Send me the zip. I check `liana_method_overlap.csv` and the top LR pairs (feeds the Reviewer 1(c) answer).
+- [x] 1.1 STAGE `A`: download Weinreb, LIANA (7 methods), build `data.pt`. 1461 progenitors confirmed.
+- [x] 1.2 LR selection reviewed: top-K raised from 64 to 128 (see PROJECT_STATUS.md).
+- [ ] 1.3 Next version: `STAGE = 'A+B+C'` with the Stage-A version attached as input. Stage A only
+      re-selects 128 pairs and rebuilds `data.pt` (≈20–30 min; no re-download); then B and C run.
 
 ## Phase 2: synthetic ground truth (STAGE `B`; ≈1–2 h; cheap)
 - [ ] 2.1 STAGE `B`: `04_synthetic_benchmark.py` (β = 1.5 and β = 0, 5 models × 3 seeds).
