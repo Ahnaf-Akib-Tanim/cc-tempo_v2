@@ -1,6 +1,15 @@
 # Running CC-Tempo v2 on Kaggle
 
-Code: https://github.com/Ahnaf-Akib-Tanim/cc-tempo_v2 (public; the notebook clones it every run).
+Code: https://github.com/Ahnaf-Akib-Tanim/cc-tempo_v2 (the notebook clones it every run).
+
+## If the repo is private: give Kaggle a read-only GitHub token (once)
+1. GitHub → your profile picture → **Settings → Developer settings → Personal access tokens → Fine-grained tokens
+   → Generate new token**. Name: `kaggle-cctempo`; Expiration: e.g. 90 days; **Repository access: Only select
+   repositories → `cc-tempo_v2`**; **Permissions → Repository permissions → Contents: Read-only**. Generate, copy it.
+2. Kaggle notebook editor → **Add-ons → Secrets → Add secret**: Label `GH_TOKEN`, Value = the token → Save,
+   and make sure the switch next to `GH_TOKEN` is **on** for this notebook.
+3. The setup cell prints `using GH_TOKEN secret for GitHub`. The token is sent as a one-time header and is not
+   stored in the clone or in the version output. When it expires, generate a new one and update the secret.
 
 ## One-time setup
 1. Kaggle → Settings → verify your phone number (needed for Internet and GPU).
@@ -44,7 +53,7 @@ after each data stage. `cct_outputs.zip` holds only results, metrics, logs and `
 | symbol | fix |
 |---|---|
 | `FAILED` in the log | send Claude the log text around it |
-| `git clone` fails | Internet is off, or the repo became private |
+| `git clone failed` / `could not read Username` | repo is private and the `GH_TOKEN` secret is missing or switched off (see top), or Internet is off |
 | CUDA out of memory in evaluation | `EXTRA_SET = ['eval.max_particles=100000']` |
 | restored nothing ("restoring" not printed) | you forgot + Add Input → Your Work → latest version |
 | version still hit 12 h | lower `SESSION_HOURS` in the setup cell to 10 |
