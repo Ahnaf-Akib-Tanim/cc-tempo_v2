@@ -73,6 +73,11 @@ class CCTempo(nn.Module):
         # *changes* in signalling, so they cannot act as hidden state features, and a knockout
         # (gate = 0) means "clamp this channel at its reference level" (an in-distribution input)
         self.center_field = bool(mcfg.get("center_field", True))
+        # centred scale >= scale_floor * reference field, and mean-field signals are softly bounded at
+        # +-sig_clip: channels whose observed field barely changes otherwise get scales ~1e-3, and small
+        # drifts of the simulated population blow up into signals of ~100 (Weinreb tier-1 diverged)
+        self.scale_floor = float(mcfg.get("scale_floor", 0.25))
+        self.sig_clip = float(mcfg.get("sig_clip", 3.0))
         self.x_dim = x_dim
         hidden = int(mcfg.get("hidden", 500))
         self.phi = PotentialMLP(x_dim, hidden, int(mcfg.get("layers", 1)), mcfg.get("activation", "softplus"))
@@ -157,7 +162,10 @@ class CCTempo(nn.Module):
         else:
             r = self.lr.receptor(xr) * self.rec_mask
             f = field - self.f_ref if self.center_field else field
-            s = g * f[None, :] * r
+            s = g * f[None, :] * r / self.s_scale
+            if self.sig_clip > 0:  # identity for |s| << sig_clip, saturates beyond
+                s = self.sig_clip * torch.tanh(s / self.sig_clip)
+            return s
         return s / self.s_scale
 
     @torch.no_grad()
@@ -177,7 +185,7 @@ class CCTempo(nn.Module):
                 fields = torch.stack([self.ligand_field(xt) for xt in x_by_time])
                 self.f_ref.copy_(fields[0])
                 dev = (fields - fields[0]).abs().max(0).values
-                endo = (dev + 0.05 * fields[0] + 1e-3) * rm
+                endo = (torch.maximum(dev, self.scale_floor * fields[0]) + 1e-3) * rm
             else:
                 endo = self.ligand_field(x, w) * rm
             sc = torch.where(self.exo_flag, torch.maximum(endo, exo), endo)

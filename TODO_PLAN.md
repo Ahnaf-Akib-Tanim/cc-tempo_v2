@@ -39,10 +39,12 @@ statistically sound and is what the reviewers asked for ("more evaluation indexe
 ## Phase 3: Weinreb main experiments (the core of the paper)
 - [x] 3.1 Timing (STAGE `C`): 50 epochs = 0.30 min (PRESCIENT), 0.47 min (v2). So runs use 2,500 epochs
       (as in v1): ~15–24 min training + ~10 min evaluation per run.
-- [ ] 3.2 **Next version: `STAGE = 'B+D+E'`** (attach the A+B+C version as input). Expected ≈ 8–9 h:
-      B (synthetic, ~1 h) → D (tier 1: 20 runs on both GPUs, ~5 h) → E (tables, baselines,
-      interpretation, ~2 h). If the log shows `[deadline]`, run `STAGE = 'D+E'` again with the newest
-      version attached; finished runs are skipped.
+- [x] 3.2 `B+D+E` (no Weinreb runs: input not restored), then `A+D+E`: 15/20 tier-1 runs finished.
+      All 5 v2_meanfield seeds diverged (centred signal scales down to 1e-3). Fixed: scale floor +
+      bounded signal + skip of diverged steps (docs/DERIVATIONS.md §1). PRESCIENT 0.472, ctrl_off 0.469,
+      v1 0.456, ctrl_shuffled 0.496 (old signal, now marked stale), v2_local 0.431, WOT 0.491 (MC PCC).
+- [ ] 3.2b **Next version: `STAGE = 'D+E'`** (attach the A+D+E version). Retrains only v2_meanfield (5)
+      and ctrl_shuffled (2, moved to runs/_stale automatically); the other 13 runs are skipped. ~3–4 h.
 - [ ] 3.3 Send me `cct_outputs.zip`. **Decision point:** if v2_meanfield does not beat prescient and the
       controls, we write the honest version (communication matters when signals vary: cytokine and
       synthetic evidence carry the paper).

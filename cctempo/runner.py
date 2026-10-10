@@ -3,6 +3,7 @@ import copy
 import json
 import os
 import pickle
+import shutil
 
 import numpy as np
 import torch
@@ -50,10 +51,25 @@ def run_name(preset, seed, tag=""):
     return f"{preset}{('_' + tag) if tag else ''}_s{seed}"
 
 
+def _stale_signal(out, cfg):
+    """True for an existing mean-field run trained before signals were bounded (no model.sig_clip)."""
+    m = cfg["model"]
+    used = os.path.join(out, "config_used.yaml")
+    if m.get("mode") != "meanfield" or m.get("context") in ("off", False) or not os.path.exists(used):
+        return False
+    with open(used) as f:
+        return "sig_clip" not in (yaml.safe_load(f) or {}).get("model", {})
+
+
 def train_one(cfg_path, preset, seed, root=".", device="auto", overrides=None, tag="", lr_method=None):
     cfg = make_cfg(cfg_path, preset, overrides)
     data = load_dataset(cfg, root, lr_method)
     out = os.path.join(P(cfg, "runs", root), run_name(preset, seed, tag))
+    if _stale_signal(out, cfg):
+        stale = os.path.join(P(cfg, "runs", root), "_stale", os.path.basename(out))
+        shutil.rmtree(stale, ignore_errors=True)
+        shutil.move(out, stale)
+        print(f"[stale] {out} used the unbounded mean-field signal; moved to {stale}, retraining")
     if os.path.exists(os.path.join(out, "run_summary.json")):
         print(f"[skip] {out} already finished")
         return out

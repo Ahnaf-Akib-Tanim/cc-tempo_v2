@@ -10,6 +10,8 @@ model:
   gate_init: prior         # prior | uniform
   grad_through_receptor: true
   softmin_tau: 0.1
+  scale_floor: 0.25        # mean-field: centred signal scale >= 0.25 x reference field
+  sig_clip: 3.0            # mean-field: signals softly bounded at +-3 (tanh)
 
 train:
   dt: 0.1

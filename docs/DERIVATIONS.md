@@ -39,7 +39,10 @@ on the signal it receives from the population:
   description of the cell's own state. A knockout (g_k = 0) then means "clamp channel k at its
   reference level", an input the model has seen. Without centring, the first synthetic benchmark
   showed decoy channels with knockout effects larger than the true channel.
-- c_k is a fixed calibration constant.
+- c_k is a fixed calibration constant: c_k = (max_t |L_k(μ_t^obs) − L_k^ref| ∨ 0.25 L_k^ref) · mean r_k.
+  The received signal is softly bounded, s ← 3 tanh(s/3) (identity for |s| ≪ 3). Without the floor and the
+  bound, channels whose observed field barely changes got c_k ≈ 10⁻³, and small drifts of the simulated
+  population became signals of ~100 that fed back through the field and diverged (Weinreb tier 1, first run).
 
 Because L_k depends on μ_t, (2) is a McKean–Vlasov SDE. As N → ∞ the interacting system becomes a
 nonlinear FPE: ∂_t p = ∇·(p ∇_x U(x; s[x, p])) + D Δp.

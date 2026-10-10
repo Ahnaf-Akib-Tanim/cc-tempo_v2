@@ -102,6 +102,8 @@ class Trainer:
             out = simulate(self.model, x, t_prev, t, self.dt, y0=y, w0=w_prev, growth=g,
                            exog_fn=exog_fn, create_graph=create_graph, generator=generator)
             x, y = out["x"], out["y"]
+            if not torch.isfinite(x).all() or float(x.detach().abs().max()) > 1e4:  # caught in fit(): step skipped
+                raise FloatingPointError(f"diverged particles at t={t}")
             t_prev = t
             if key not in self.tgt:
                 continue
@@ -131,8 +133,11 @@ class Trainer:
         gen = torch.Generator(device=self.device).manual_seed(1234)
         for _ in range(n_rep):
             for cond in self.conditions:
-                ls = self._rollout_loss("val", cond, create_graph=False, generator=gen,
-                                        times=self.train_times + self.holdout_times)
+                try:
+                    ls = self._rollout_loss("val", cond, create_graph=False, generator=gen,
+                                            times=self.train_times + self.holdout_times)
+                except FloatingPointError:
+                    ls = {t: float("inf") for t in self.train_times + self.holdout_times}
                 for t, l in ls.items():
                     tot.setdefault(t, []).append(float(l))
         return {t: float(np.mean(v)) for t, v in tot.items()}
@@ -168,20 +173,32 @@ class Trainer:
         lam = float(self.mcfg.get("gate_l1", self.t.get("gate_l1", 0.0)))  # a model preset may override
         clip = float(self.t.get("clip", 0.25))
         stopped_early = False
+        n_bad = 0
         for epoch in range(start, epochs):
             self.model.train()
             self.opt.zero_grad()
             tot = 0.0
-            for cond in self.conditions:
-                ls = self._rollout_loss("train", cond, create_graph=True)
-                loss = sum(ls.values()) / max(1, len(self.conditions))
-                if lam > 0 and self.model.K:
-                    loss = loss + lam * torch.sigmoid(self.model.gate_logit).sum() / len(self.conditions)
-                loss.backward()
-                tot += float(loss.detach())
-            if clip > 0:
-                torch.nn.utils.clip_grad_norm_(self.model.parameters(), clip)
-            self.opt.step()
+            try:
+                for cond in self.conditions:
+                    ls = self._rollout_loss("train", cond, create_graph=True)
+                    loss = sum(ls.values()) / max(1, len(self.conditions))
+                    if lam > 0 and self.model.K:
+                        loss = loss + lam * torch.sigmoid(self.model.gate_logit).sum() / len(self.conditions)
+                    if not torch.isfinite(loss):
+                        raise FloatingPointError("non-finite loss")
+                    loss.backward()
+                    tot += float(loss.detach())
+            except FloatingPointError as e:  # skip this update; give up if it keeps happening
+                n_bad += 1
+                print(f"[skip] epoch {epoch+1}: {e} ({n_bad} skipped)")
+                if n_bad > 50:
+                    raise
+                self.opt.zero_grad()
+                tot = float("nan")
+            else:
+                if clip > 0:
+                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), clip)
+                self.opt.step()
             self.sched.step()
             last = epoch + 1 == epochs
             if (epoch + 1) % eval_every == 0 or last:
