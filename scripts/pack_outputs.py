@@ -14,7 +14,7 @@ p.add_argument("--out", default=None)
 p.add_argument("--with-models", action="store_true")
 args = p.parse_args()
 out = args.out or os.path.join(args.root, "cct_outputs.zip")
-keep_ext = {".csv", ".json", ".yaml", ".txt", ".npz", ".npy", ".md", ".png", ".pdf"}
+keep_ext = {".csv", ".json", ".yaml", ".txt", ".log", ".npz", ".npy", ".md", ".png", ".pdf"}
 n = 0
 with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
     for base, _, files in os.walk(os.path.join(args.root, "work")):
