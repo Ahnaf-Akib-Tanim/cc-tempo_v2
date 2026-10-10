@@ -55,5 +55,5 @@ after each data stage. `cct_outputs.zip` holds only results, metrics, logs and `
 | `FAILED` in the log | send Claude the log text around it |
 | `git clone failed` / `could not read Username` | repo is private and the `GH_TOKEN` secret is missing or switched off (see top), or Internet is off |
 | CUDA out of memory in evaluation | `EXTRA_SET = ['eval.max_particles=100000']` |
-| restored nothing ("restoring" not printed) | you forgot + Add Input → Your Work → latest version |
+| `nothing restored` / `data.pt NO` | the attached version has no `work/` (e.g. a failed version). Run the data stage again (`A+…`), or attach a version that has it. The log lists every attached input folder |
 | version still hit 12 h | lower `SESSION_HOURS` in the setup cell to 10 |

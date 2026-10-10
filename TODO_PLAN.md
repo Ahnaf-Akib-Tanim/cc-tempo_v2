@@ -43,8 +43,10 @@ statistically sound and is what the reviewers asked for ("more evaluation indexe
       All 5 v2_meanfield seeds diverged (centred signal scales down to 1e-3). Fixed: scale floor +
       bounded signal + skip of diverged steps (docs/DERIVATIONS.md §1). PRESCIENT 0.472, ctrl_off 0.469,
       v1 0.456, ctrl_shuffled 0.496 (old signal, now marked stale), v2_local 0.431, WOT 0.491 (MC PCC).
-- [ ] 3.2b **Next version: `STAGE = 'D+E'`** (attach the A+D+E version). Retrains only v2_meanfield (5)
-      and ctrl_shuffled (2, moved to runs/_stale automatically); the other 13 runs are skipped. ~3–4 h.
+- [x] 3.2b `D+E` failed: `work/` was never restored from the attached input (in no version so far).
+      Restore now searches every depth of /kaggle/input and lives in scripts/kaggle_run.py.
+- [ ] 3.2c **Next version: `STAGE = 'A+D+E'`** with the new notebook cell. Rebuilds the data and trains all
+      20 tier-1 runs with the fixed model (~7–9 h). Check the log start: `restoring ...` and `data.pt`.
 - [ ] 3.3 Send me `cct_outputs.zip`. **Decision point:** if v2_meanfield does not beat prescient and the
       controls, we write the honest version (communication matters when signals vary: cytokine and
       synthetic evidence carry the paper).
