@@ -68,8 +68,9 @@ statistically sound and is what the reviewers asked for ("more evaluation indexe
 ## Phase 4: cytokine perturbation (Kaggle; strongest biological evidence)
 - [ ] 4.1 `10_cytokine_experiments.py --evidence` (already run locally: results in
       `work/cytokine/results/evidence_*.csv`, M-CSF vs G-CSF on the same 187 clones, p < 1e-4).
-- [ ] 4.2 **VERIFY** the full-cocktail cytokine list in Weinreb et al. 2020 Methods and fix
-      `configs/cytokine.yaml → train.condition_cytokines["full cocktail"]`.
+- [x] 4.2 Cocktail verified (Supp Methods 2.5, 8.1): IL-3, FLT3-L, IL-11, IL-5, TPO, SCF, IL-6, EPO; arms on day 2:
+      cocktail / M-CSF / G-CSF / EPO (SCF arm only in GEO metadata, Day 4 only). Config fixed; IL-11 and IL-5
+      channels added, so F1's LIANA/build steps must run again (STAGE `F1+F2`).
 - [ ] 4.3 **Next version: `STAGE = 'F1+G1'` (Accelerator None)**. STAGE `F1` (prepare → LIANA → build), then STAGE `F2` (tier1 5 runs → tier2 leave-one-medium-out
       6 runs → evaluate → dose-response).
 - [ ] 4.4 Expected: v2 predicts the held-out medium's composition shift (M-CSF → more monocytes,

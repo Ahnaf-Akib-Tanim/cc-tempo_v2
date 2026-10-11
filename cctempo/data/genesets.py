@@ -47,6 +47,8 @@ CYTOKINE_PAIRS = {
     "IL-6": (["Il6"], ["Il6ra", "Il6st"]),
     "TPO": (["Thpo"], ["Mpl"]),
     "Flt3L": (["Flt3l"], ["Flt3"]),
+    "IL-11": (["Il11"], ["Il11ra1", "Il6st"]),
+    "IL-5": (["Il5"], ["Il5ra", "Csf2rb"]),
     # SAG is a small-molecule Smoothened agonist: modelled as an exogenous Hedgehog input received
     # through Smo. Endogenous Shh (floor plate) enters through LIANA's Shh -> Ptch1_Smo pair.
     "SAG": (["Shh"], ["Smo"]),

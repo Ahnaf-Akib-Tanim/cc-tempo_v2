@@ -22,17 +22,19 @@ prepare:
   liana_max_cells_per_group: 1500
   lr_top_k: 128
   lr_method: rank_aggregate
-  force_cytokines: [M-csf, G-csf, Epo, SCF, GM-csf, IL-3, IL-6, TPO, Flt3L]
+  force_cytokines: [M-csf, G-csf, Epo, SCF, IL-3, IL-6, TPO, Flt3L, IL-11, IL-5]
 
 train:
   start_time: 2.0
   train_times: [4.0, 6.0]
   start_condition: null          # Day-2 cells are shared (all labelled 'full cocktail' before replating)
   conditions: [full cocktail, M-csf, G-csf, Epo, SCF]
-  # !!! VERIFY the full-cocktail composition in Weinreb et al. 2020 (Methods, cytokine perturbation).
-  # The single-cytokine arms are taken from the metadata labels.
+  # Weinreb et al. 2020, Supp Methods 2.5 and 8.1: StemSpan + IL-3 20, FLT3-L 50, IL-11 50, IL-5 10,
+  # TPO 50, mSCF 50, IL-6 10 ng/mL and EPO 3 U/mL (no GM-/M-/G-CSF). On day 2 the cells were re-plated in
+  # the same cocktail, M-CSF 20 ng/mL, G-CSF 20 ng/mL or EPO 3 U/mL (each in StemSpan). The 'SCF' arm is in
+  # the GEO metadata (Day 4 only) but not described in the paper.
   condition_cytokines:
-    full cocktail: [SCF, Flt3L, IL-3, IL-6, TPO, Epo, GM-csf, M-csf, G-csf]
+    full cocktail: [IL-3, Flt3L, IL-11, IL-5, TPO, SCF, IL-6, Epo]
     M-csf: [M-csf]
     G-csf: [G-csf]
     Epo: [Epo]
