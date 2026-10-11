@@ -52,15 +52,25 @@ statistically sound and is what the reviewers asked for ("more evaluation indexe
       worse than PRESCIENT (5.6 vs 3.8); W2 and L1 composition are better.
 - [x] 3.3 Decision point: v2_meanfield beats PRESCIENT, ctrl_off and v1 on Weinreb. The shuffled control
       has only 2 seeds, so 3 more are added to tier 2 and 07_evaluate now also tests against ctrl_shuffled.
-- [ ] 3.4 **Next version: `STAGE = 'W2+B'`**: Weinreb tier 2 (15 runs: CCC-method robustness, ctrl_random,
-      ctrl_shuffled seeds 2–4, held-out Day 4) + synthetic benchmark with the bounded signal. ~6–7 h.
+- [x] 3.4 `W2+B` (restore from the attached version worked). Weinreb MC PCC: **ctrl_random 0.505 (2 seeds)**,
+      v2_meanfield 0.500, v2 with CellPhoneDB/CellChat/NATMI pairs 0.486–0.489, ctrl_shuffled 0.482 (5 seeds),
+      PRESCIENT 0.472. v2 − shuffled: +0.016 [0.005, 0.028], Holm p = 0.08. Held-out Day 4: v2 worse than
+      PRESCIENT (KL 16.8 vs 7.1 bits, W2 11.0 vs 9.3).
+      Synthetic (bounded signal): mean-field models recover the communication-driven fate (err 0.02–0.03 vs
+      PRESCIENT 0.32) but so does ctrl_shuffled (0.05); without a dose, decoy knockouts (~1.0) dwarf the true
+      channel (~0.1), also at β = 0; with a dose the true channel wins 3/3 (also for ctrl_shuffled, because the
+      dose enters that channel by construction).
+      **Reading:** population (mean-field) coupling improves fate prediction, but *which* LR channel carries it
+      is not identifiable from unperturbed time courses: channel fields are collinear summaries of population
+      composition. Channel identity needs perturbations → the cytokine experiment (Phase 4) is the key evidence.
+      To discuss with the co-authors before the rewrite.
 
 ## Phase 4: cytokine perturbation (Kaggle; strongest biological evidence)
 - [ ] 4.1 `10_cytokine_experiments.py --evidence` (already run locally: results in
       `work/cytokine/results/evidence_*.csv`, M-CSF vs G-CSF on the same 187 clones, p < 1e-4).
 - [ ] 4.2 **VERIFY** the full-cocktail cytokine list in Weinreb et al. 2020 Methods and fix
       `configs/cytokine.yaml → train.condition_cytokines["full cocktail"]`.
-- [ ] 4.3 STAGE `F1` (prepare → LIANA → build), then STAGE `F2` (tier1 5 runs → tier2 leave-one-medium-out
+- [ ] 4.3 **Next version: `STAGE = 'F1+G1'` (Accelerator None)**. STAGE `F1` (prepare → LIANA → build), then STAGE `F2` (tier1 5 runs → tier2 leave-one-medium-out
       6 runs → evaluate → dose-response).
 - [ ] 4.4 Expected: v2 predicts the held-out medium's composition shift (M-CSF → more monocytes,
       G-CSF → more neutrophils). PRESCIENT cannot, because it has no input for the medium.
