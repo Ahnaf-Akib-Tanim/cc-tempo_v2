@@ -82,7 +82,9 @@ statistically sound and is what the reviewers asked for ("more evaluation indexe
       cell types, no SAG-dose column); timepoints D3–D8 plus 05h–20h (= Day 3 + hours, replicate r4 only).
       The prepare step stopped after inspect (no prepare_summary.json; cause not logged). Fixed: hour
       parsing, layer handling, and the runner now saves its full console log into the zip.
-      **Next version: `STAGE = 'G1+F1+F2'`.**
+      Added scripts/13_early_progenitors.py (stage `EP`): PCC on CD34+ early progenitors (Weinreb Fig 5c,d)
+      and the held-out-clone upper bound (Supp Methods 13.5), from saved predictions.
+      **Next version: `STAGE = 'G1+F1+EP+F2'`.**
 - [ ] 5.1 STAGE `G1` first, then send me `work/neural_tube/inspect.txt`. I need to confirm the time and
       cell-type columns (or the marker annotation) before training.
 - [ ] 5.2 STAGE `G2`: LIANA → build → tier1 (5 runs) → evaluate → `--analyze`.

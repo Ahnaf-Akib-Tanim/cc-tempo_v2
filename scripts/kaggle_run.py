@@ -146,6 +146,10 @@ def stage(st):
             run(f"{py} scripts/07_evaluate.py --config weinreb.yaml {R}")
             run(f"{py} scripts/08_baselines.py --config weinreb.yaml {R} --methods wot cfm")
             run(f"{py} scripts/09_interpret.py --config weinreb.yaml {R} --run v2_meanfield_s0")
+            run(f"{py} scripts/13_early_progenitors.py --config weinreb.yaml {R}")
+    elif st == "EP":   # early (CD34+) progenitors + held-out-clone upper bound, from saved predictions
+        if need("work/weinreb/data.pt", WEINREB_HINT):
+            run(f"{py} scripts/13_early_progenitors.py --config weinreb.yaml {R}")
     elif st == "W2":
         if need("work/weinreb/data.pt", WEINREB_HINT):
             grid("weinreb", "tier2")
@@ -182,9 +186,9 @@ def stage(st):
 
 
 STAGES = [x.strip().upper() for x in args.stage.split("+") if x.strip()]
-bad = [x for x in STAGES if x not in ("A", "B", "C", "D", "E", "W2", "W3", "F1", "F2", "G1", "G2")]
+bad = [x for x in STAGES if x not in ("A", "B", "C", "D", "E", "EP", "W2", "W3", "F1", "F2", "G1", "G2")]
 if bad:
-    sys.exit(f"unknown stage(s) {bad}; valid: A B C D E W2 W3 F1 F2 G1 G2")
+    sys.exit(f"unknown stage(s) {bad}; valid: A B C D E EP W2 W3 F1 F2 G1 G2")
 os.makedirs(ROOT, exist_ok=True)
 LOG = open(f"{ROOT}/kaggle_log_{time.strftime('%Y%m%d_%H%M')}.txt", "w")
 restore()
