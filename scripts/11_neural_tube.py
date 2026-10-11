@@ -36,9 +36,13 @@ cfg = load_config(_common.cfg_path(args.config), args.set)
 pc = cfg["prepare"]
 
 
-def parse_time(v):
+def parse_time(v, hours_after_day=pc.get("hours_after_day", 3.0)):
+    """Time in days. 'D5' -> 5; '05h' -> hours after Day 3 (replicate r4: 3.21 ... 3.83)."""
     if isinstance(v, (int, float, np.integer, np.floating)):
         return float(v)
+    m = re.fullmatch(r"\s*(\d+(\.\d+)?)\s*h\s*", str(v))
+    if m:
+        return hours_after_day + float(m.group(1)) / 24.0
     m = re.search(r"(\d+(\.\d+)?)", str(v))
     return float(m.group(1)) if m else np.nan
 
@@ -55,8 +59,7 @@ if args.prepare:
     with open(os.path.join(P(cfg, "work", args.root), "inspect.txt"), "w") as f:
         f.write(report)
     nt.total_counts_layer(adata)
-    for k in list(adata.layers.keys()):
-        del adata.layers[k]
+    adata = ad.AnnData(X=adata.X, obs=adata.obs.copy(), var=adata.var.copy())  # drop layers (one is keyed None)
     sc.pp.filter_cells(adata, min_counts=pc.get("min_counts", 1000))
     sc.pp.filter_genes(adata, min_cells=10)
     tk = pc["time_key"] if pc["time_key"] != "auto" else nt.find_key(adata, nt.TIME_KEYS)

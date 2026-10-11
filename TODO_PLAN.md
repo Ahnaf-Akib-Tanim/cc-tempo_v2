@@ -77,6 +77,12 @@ statistically sound and is what the reviewers asked for ("more evaluation indexe
       G-CSF → more neutrophils). PRESCIENT cannot, because it has no input for the medium.
 
 ## Phase 5: neural tube, the PNAS system (Kaggle)
+- [x] 5.0 `F1+G1`: cytokine data built (65,075 cells; progenitors: cocktail 662, M-CSF 713, G-CSF 495,
+      Epo 106, SCF 145; clone-matched evidence holds). Neural tube: obs has only timepoint/rep/sample (no
+      cell types, no SAG-dose column); timepoints D3–D8 plus 05h–20h (= Day 3 + hours, replicate r4 only).
+      The prepare step stopped after inspect (no prepare_summary.json; cause not logged). Fixed: hour
+      parsing, layer handling, and the runner now saves its full console log into the zip.
+      **Next version: `STAGE = 'G1+F1+F2'`.**
 - [ ] 5.1 STAGE `G1` first, then send me `work/neural_tube/inspect.txt`. I need to confirm the time and
       cell-type columns (or the marker annotation) before training.
 - [ ] 5.2 STAGE `G2`: LIANA → build → tier1 (5 runs) → evaluate → `--analyze`.

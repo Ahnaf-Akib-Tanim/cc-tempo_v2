@@ -30,8 +30,15 @@ os.environ.setdefault("CCT_DEADLINE", str(time.time() + args.hours * 3600))
 os.chdir(CODE)
 
 
+LOG = None  # whole console log, copied into work/ so it travels in cct_outputs.zip
+
+
 def say(*a):
-    print(*a, flush=True)
+    msg = " ".join(str(x) for x in a)
+    print(msg, flush=True)
+    if LOG:
+        LOG.write(msg + "\n")
+        LOG.flush()
 
 
 # ------------------------------------------------------------------ restore
@@ -78,7 +85,11 @@ def run(cmd):
     if args.set and "--set" not in cmd:
         cmd += " --set " + " ".join(args.set)
     say("\n$", cmd)
-    rc = subprocess.run(cmd, shell=True).returncode
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+                         bufsize=1, errors="replace")
+    for line in p.stdout:
+        say(line.rstrip("\n"))
+    rc = p.wait()
     if rc != 0:
         say(f"!!! FAILED ({rc}): {cmd}")
     return rc
@@ -174,6 +185,8 @@ STAGES = [x.strip().upper() for x in args.stage.split("+") if x.strip()]
 bad = [x for x in STAGES if x not in ("A", "B", "C", "D", "E", "W2", "W3", "F1", "F2", "G1", "G2")]
 if bad:
     sys.exit(f"unknown stage(s) {bad}; valid: A B C D E W2 W3 F1 F2 G1 G2")
+os.makedirs(ROOT, exist_ok=True)
+LOG = open(f"{ROOT}/kaggle_log_{time.strftime('%Y%m%d_%H%M')}.txt", "w")
 restore()
 run(f"{sys.executable} scripts/00_check_env.py")
 for st in STAGES:
@@ -182,6 +195,7 @@ for st in STAGES:
 
 # always last: small zip of results/metrics/logs/models to download and send to Claude
 os.makedirs(f"{ROOT}/work", exist_ok=True)
-for f in glob.glob(f"{ROOT}/grid_*.log"):
+LOG.flush()
+for f in glob.glob(f"{ROOT}/grid_*.log") + glob.glob(f"{ROOT}/kaggle_log_*.txt"):
     shutil.copy(f, f"{ROOT}/work/")               # logs travel with work/ into the next version
 run(f"{sys.executable} scripts/pack_outputs.py {R} --with-models")
