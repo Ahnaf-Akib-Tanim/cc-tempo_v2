@@ -24,7 +24,7 @@ from cctempo.utils import load_config
 
 p = _common.parser(__doc__, "weinreb.yaml")
 p.add_argument("--aggregate-only", action="store_true")
-p.add_argument("--refs", nargs="*", default=["prescient", "ctrl_off", "v1"])
+p.add_argument("--refs", nargs="*", default=["prescient", "ctrl_off", "ctrl_shuffled", "v1"])
 p.add_argument("--metric", default="pcc")
 args = p.parse_args()
 cfg = load_config(_common.cfg_path(args.config), args.set)

@@ -19,6 +19,7 @@ weinreb:
     # connectome / geometric_mean / singlecellsignalr rank LR pairs exactly like natmi (same
     # expression-product magnitude; Jaccard 1.0 in Stage A), so they are not run separately.
     - {preset: ctrl_random,  seeds: [0, 1]}
+    - {preset: ctrl_shuffled, seeds: [2, 3, 4]}   # 5 seeds in total: the key control for v2_meanfield
     - {preset: prescient,    seeds: [0, 1], tag: hold4, set: ["train.holdout_times=[4.0]"]}
     - {preset: v2_meanfield, seeds: [0, 1], tag: hold4, set: ["train.holdout_times=[4.0]"]}
   tier3:

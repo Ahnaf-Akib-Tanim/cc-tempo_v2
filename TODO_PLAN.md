@@ -45,11 +45,15 @@ statistically sound and is what the reviewers asked for ("more evaluation indexe
       v1 0.456, ctrl_shuffled 0.496 (old signal, now marked stale), v2_local 0.431, WOT 0.491 (MC PCC).
 - [x] 3.2b `D+E` failed: `work/` was never restored from the attached input (in no version so far).
       Restore now searches every depth of /kaggle/input and lives in scripts/kaggle_run.py.
-- [ ] 3.2c **Next version: `STAGE = 'A+D+E'`** with the new notebook cell. Rebuilds the data and trains all
-      20 tier-1 runs with the fixed model (~7–9 h). Check the log start: `restoring ...` and `data.pt`.
-- [ ] 3.3 Send me `cct_outputs.zip`. **Decision point:** if v2_meanfield does not beat prescient and the
-      controls, we write the honest version (communication matters when signals vary: cytokine and
-      synthetic evidence carry the paper).
+- [x] 3.2c `A+D+E` again: all 20 tier-1 runs finished (1 diverged step skipped). Monte-Carlo fate-bias PCC
+      (mean ± sd over seeds): **v2_meanfield 0.500 ± 0.004** (5/5 seeds above every PRESCIENT seed), WOT 0.491,
+      ctrl_shuffled 0.475 (2 seeds), PRESCIENT 0.472 ± 0.014, ctrl_off 0.469, v2_local 0.466, v1 0.456, OT-CFM 0.27.
+      Paired bootstrap v2_meanfield − PRESCIENT: +0.034 [0.018, 0.051], Holm p = 0.003. KL bits at Day 4 are
+      worse than PRESCIENT (5.6 vs 3.8); W2 and L1 composition are better.
+- [x] 3.3 Decision point: v2_meanfield beats PRESCIENT, ctrl_off and v1 on Weinreb. The shuffled control
+      has only 2 seeds, so 3 more are added to tier 2 and 07_evaluate now also tests against ctrl_shuffled.
+- [ ] 3.4 **Next version: `STAGE = 'W2+B'`**: Weinreb tier 2 (15 runs: CCC-method robustness, ctrl_random,
+      ctrl_shuffled seeds 2–4, held-out Day 4) + synthetic benchmark with the bounded signal. ~6–7 h.
 
 ## Phase 4: cytokine perturbation (Kaggle; strongest biological evidence)
 - [ ] 4.1 `10_cytokine_experiments.py --evidence` (already run locally: results in
