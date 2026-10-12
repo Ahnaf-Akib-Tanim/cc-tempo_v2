@@ -170,6 +170,8 @@ def evaluate_run(run_dir, root=".", device="auto", which="best", n_copies=None, 
                 Tt = op.transitions(t0, t, dt, field_traj=field, exog_fn=exog)
                 psim = op.evolve(Tt, p0)[-1]
                 m = cells(data, t, "all", cond if data.get("condition") is not None and cond else None)
+                if not np.any(m):  # e.g. the cytokine 'SCF' arm has Day 4 only
+                    continue
                 pobs = op.histogram(data["x"][time_index(data, t)][torch.from_numpy(np.where(m)[0])].numpy())
                 kl[str(t)] = {"kl_bits": kl_bits(pobs, psim), "entropy_bits": entropy_bits(pobs)}
             res["pathint"][key]["kl"] = kl

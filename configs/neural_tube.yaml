@@ -27,6 +27,9 @@ prepare:
   pnas_genes: [Gm32061, Gpm6b, Glra1, Nav2, Sox9, Nkx2-2, Gm38103, Neurog2, Olig2, Nkx2-9, Slc2a1, Slit3, Slit2, Shh, Foxa2, Spon1, Slit1]
 
 train:
+  start_time: 3.0
+  train_times: [4.0, 5.0, 6.0, 7.0, 8.0]   # whole days (all replicates); the Day 3.2-3.8 samples (r4
+                                         # only) are kept for evaluation as interpolation points
   conditions: [SAG]
   condition_cytokines:
     SAG: [SAG]

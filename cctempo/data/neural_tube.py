@@ -16,7 +16,7 @@ URL = "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE236nnn/GSE236512/suppl/GSE2365
 # marker programmes (mouse); used only when the object has no usable annotation
 MARKERS = {
     "NMP": ["T", "Tbxt", "Nkx1-2", "Cdx2", "Fgf8", "Wnt3a"],
-    "p0/p1": ["Dbx1", "Dbx2", "Pax6", "Irx3"],
+    "p0_p1": ["Dbx1", "Dbx2", "Pax6", "Irx3"],  # no "/" in names: h5py keys cannot contain it
     "p2": ["Foxn4", "Vsx1", "Irx3", "Nkx6-1"],
     "pMN": ["Olig2", "Olig1"],
     "p3": ["Nkx2-2", "Nkx2-9"],

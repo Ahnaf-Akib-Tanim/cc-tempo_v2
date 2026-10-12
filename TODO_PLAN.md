@@ -85,6 +85,16 @@ statistically sound and is what the reviewers asked for ("more evaluation indexe
       Added scripts/13_early_progenitors.py (stage `EP`): PCC on CD34+ early progenitors (Weinreb Fig 5c,d)
       and the held-out-clone upper bound (Supp Methods 13.5), from saved predictions.
       **Next version: `STAGE = 'G1+F1+EP+F2'`.**
+- [x] 5.0b `F1+G1+F2` ran **without GPU** (CUDA False): F1 done (data.pt with IL-11/IL-5); G1 annotation OK
+      (FP/p3/pMN/p2/neurons appear from Day 4; NMP at Day 3) but saving failed on the key 'p0/p1';
+      F2 trained only prescient_s0/s1 and v2_meanfield_s0 to epoch 420, then the 12 h limit. Fixed: marker
+      name, empty-condition KL (SCF arm has Day 4 only), GPU guard, pack after every stage. Neural tube now
+      trains on whole days 4–8 (Day 3.2–3.8 = r4-only interpolation points).
+      EP run locally on the downloaded data (results/early_progenitors_*.csv): held-out-clone ceiling
+      0.556 (all) / 0.478 (most immature half); v2_meanfield 0.500 / 0.382, PRESCIENT 0.472 / 0.349,
+      WOT 0.491 / 0.334, ctrl_random 0.505 / 0.393. v2 > PRESCIENT in the immature half (+0.039, Holm
+      p = 0.004) and > ctrl_shuffled (+0.025, p = 0.012); = ctrl_random. Most immature quarter: n.s.
+      **Next version: `STAGE = 'G1+F2+G2'` with GPU T4 x2.**
 - [ ] 5.1 STAGE `G1` first, then send me `work/neural_tube/inspect.txt`. I need to confirm the time and
       cell-type columns (or the marker annotation) before training.
 - [ ] 5.2 STAGE `G2`: LIANA → build → tier1 (5 runs) → evaluate → `--analyze`.

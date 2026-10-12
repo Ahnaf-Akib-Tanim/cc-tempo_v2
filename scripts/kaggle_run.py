@@ -21,6 +21,7 @@ ap.add_argument("--stage", required=True, help="stages joined by '+', e.g. D+E")
 ap.add_argument("--root", default="/kaggle/working")
 ap.add_argument("--set", nargs="*", default=[], help="config overrides passed to every step")
 ap.add_argument("--hours", type=float, default=10.75, help="Kaggle stops a version at 12 h")
+ap.add_argument("--allow-cpu", action="store_true", help="run GPU stages even without a GPU (very slow)")
 args = ap.parse_args()
 ROOT = args.root
 R = f"--root {ROOT}"
@@ -189,17 +190,29 @@ STAGES = [x.strip().upper() for x in args.stage.split("+") if x.strip()]
 bad = [x for x in STAGES if x not in ("A", "B", "C", "D", "E", "EP", "W2", "W3", "F1", "F2", "G1", "G2")]
 if bad:
     sys.exit(f"unknown stage(s) {bad}; valid: A B C D E EP W2 W3 F1 F2 G1 G2")
+GPU_STAGES = {"C", "D", "E", "W2", "W3", "F2", "G2"}
+
+
+def pack():
+    """Copy logs into work/ and zip the small outputs; done after every stage so a 12 h kill loses little."""
+    os.makedirs(f"{ROOT}/work", exist_ok=True)
+    LOG.flush()
+    for f in glob.glob(f"{ROOT}/grid_*.log") + glob.glob(f"{ROOT}/kaggle_log_*.txt"):
+        shutil.copy(f, f"{ROOT}/work/")           # logs travel with work/ into the next version
+    run(f"{sys.executable} scripts/pack_outputs.py {R} --with-models")
+
+
 os.makedirs(ROOT, exist_ok=True)
 LOG = open(f"{ROOT}/kaggle_log_{time.strftime('%Y%m%d_%H%M')}.txt", "w")
+import torch  # noqa: E402
+if GPU_STAGES & set(STAGES) and not torch.cuda.is_available() and not args.allow_cpu:
+    say(f"!!! no GPU, but stage(s) {sorted(GPU_STAGES & set(STAGES))} need one (CPU is ~10x slower and would hit "
+        "the 12 h limit). Settings -> Accelerator -> GPU T4 x2, then Save & Run All again. Nothing was run.")
+    sys.exit(1)
 restore()
 run(f"{sys.executable} scripts/00_check_env.py")
 for st in STAGES:
     say("=" * 20, "STAGE", st, "=" * 20)
     stage(st)
+    pack()
 
-# always last: small zip of results/metrics/logs/models to download and send to Claude
-os.makedirs(f"{ROOT}/work", exist_ok=True)
-LOG.flush()
-for f in glob.glob(f"{ROOT}/grid_*.log") + glob.glob(f"{ROOT}/kaggle_log_*.txt"):
-    shutil.copy(f, f"{ROOT}/work/")               # logs travel with work/ into the next version
-run(f"{sys.executable} scripts/pack_outputs.py {R} --with-models")
