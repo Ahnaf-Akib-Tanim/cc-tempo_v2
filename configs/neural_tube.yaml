@@ -10,7 +10,8 @@ paths:
   results: work/neural_tube/results
 
 prepare:
-  time_key: timepoint            # 'D3'..'D8' and '05h'..'20h' (= hours after Day 3, replicate r4 only)
+  time_key: auto                 # prepare reads obs 'timepoint' ('D3'..'D8', '05h'..'20h' = hours after Day 3,
+                                 # replicate r4 only) and stores days in 'cct_time', which 02/03 then use
   hours_after_day: 3.0
   celltype_key: auto             # existing annotation if found, otherwise marker-based
   n_hvg: 2000

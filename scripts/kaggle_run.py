@@ -160,6 +160,11 @@ def stage(st):
             grid("weinreb", "tier3")
             run(f"{py} scripts/07_evaluate.py --config weinreb.yaml {R}")
     elif st == "F1":
+        runs = f"{ROOT}/work/cytokine/runs"
+        if os.path.isdir(runs) and os.listdir(runs):   # data.pt is rebuilt below: earlier runs no longer match it
+            prev = f"{runs}_prev_{time.strftime('%Y%m%d_%H%M')}"
+            shutil.move(runs, prev)
+            say(f"[F1] earlier cytokine runs moved to {prev} (they were trained on the previous data.pt)")
         run(f"{py} scripts/10_cytokine_experiments.py --config cytokine.yaml --evidence {R}")
         run(f"{py} scripts/01_prepare_weinreb.py --config cytokine.yaml {R}")
         run(f"{py} scripts/02_liana_ccc.py --config cytokine.yaml {R}")
@@ -170,13 +175,14 @@ def stage(st):
             grid("cytokine", "tier1")
             grid("cytokine", "tier2")
             run(f"{py} scripts/07_evaluate.py --config cytokine.yaml {R}")
+            run(f"{py} scripts/14_cytokine_shifts.py --config cytokine.yaml {R}")
             run(f"{py} scripts/10_cytokine_experiments.py --config cytokine.yaml --dose-response --run v2_meanfield_s0 {R}")
     elif st == "G1":
         run(f"{py} scripts/11_neural_tube.py --prepare {R}")
         shutil.rmtree(f"{ROOT}/raw/neural_tube", ignore_errors=True)
         run(f"cat {ROOT}/work/neural_tube/inspect.txt")
     elif st == "G2":
-        if need("work/neural_tube", "Attach the version that ran stage G1."):
+        if need("work/neural_tube/nt_log.h5ad", "Attach the version that ran stage G1 (or run G1+G2)."):
             run(f"{py} scripts/02_liana_ccc.py --config neural_tube.yaml {R}")
             run(f"{py} scripts/03_build_dataset.py --config neural_tube.yaml {R}")
             grid("neural_tube", "tier1")

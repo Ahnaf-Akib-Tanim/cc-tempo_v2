@@ -95,6 +95,17 @@ statistically sound and is what the reviewers asked for ("more evaluation indexe
       WOT 0.491 / 0.334, ctrl_random 0.505 / 0.393. v2 > PRESCIENT in the immature half (+0.039, Holm
       p = 0.004) and > ctrl_shuffled (+0.025, p = 0.012); = ctrl_random. Most immature quarter: n.s.
       **Next version: `STAGE = 'G1+F2+G2'` with GPU T4 x2.**
+- [x] 5.0c `G1+F2+G2` (GPU): G1 done. F2 done, but restored the F1+G1 version, so cytokine data.pt was the
+      OLD build (GM-CSF channel, no IL-11/IL-5). G2 failed: time_key 'timepoint' made 03 read '05h' (fixed:
+      back to auto/cct_time). Cytokine results (results/cytokine_*): per-medium composition much better
+      than PRESCIENT (Day-6 L1: Epo 0.17 vs 1.48, M-CSF 0.10 vs 1.16, G-CSF 0.32 vs 0.74, cocktail 0.26 vs 0.43);
+      clone-matched shifts in the right direction for the large contrasts (G-CSF − M-CSF obs +0.19, pred
+      +0.35…+0.70; M-CSF − cocktail obs −0.13, pred −0.01…−0.02) with per-cell r 0.1–0.3 (PRESCIENT ~0),
+      but magnitudes too large and spurious shifts where none are observed (G-CSF/Epo vs cocktail);
+      held-out medium FAILS (dose of an unseen cytokine is never trained, stays 1.0). The one shuffled run
+      also fits composition → specificity not shown yet. Added ctrl_shuffled/ctrl_random ×3 to cytokine
+      tier 1, scripts/14_cytokine_shifts.py; F1 now sets earlier cytokine runs aside.
+      **Next version: `STAGE = 'G2+F1+F2'` (attach THIS version).**
 - [ ] 5.1 STAGE `G1` first, then send me `work/neural_tube/inspect.txt`. I need to confirm the time and
       cell-type columns (or the marker annotation) before training.
 - [ ] 5.2 STAGE `G2`: LIANA → build → tier1 (5 runs) → evaluate → `--analyze`.

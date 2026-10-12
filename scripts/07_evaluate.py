@@ -24,12 +24,14 @@ from cctempo.utils import load_config
 
 p = _common.parser(__doc__, "weinreb.yaml")
 p.add_argument("--aggregate-only", action="store_true")
-p.add_argument("--refs", nargs="*", default=["prescient", "ctrl_off", "ctrl_shuffled", "v1"])
+p.add_argument("--refs", nargs="*", default=["prescient", "ctrl_off", "ctrl_shuffled", "ctrl_random", "v1"])
 p.add_argument("--metric", default="pcc")
 args = p.parse_args()
 cfg = load_config(_common.cfg_path(args.config), args.set)
 runs = sorted(d for d in glob.glob(os.path.join(P(cfg, "runs", args.root), "*")) if os.path.exists(os.path.join(d, "run_summary.json")))
 print(f"{len(runs)} finished runs")
+if not runs:
+    raise SystemExit(0)
 rows, preds = [], {}
 for r in runs:
     mpath = os.path.join(r, "metrics_best.json")

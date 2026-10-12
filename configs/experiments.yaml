@@ -29,9 +29,11 @@ weinreb:
 
 cytokine:
   config: cytokine.yaml
-  tier1:          # all conditions jointly
-    - {preset: prescient,    seeds: [0, 1]}
-    - {preset: v2_meanfield, seeds: [0, 1, 2]}
+  tier1:          # all conditions jointly; the two gene controls test receptor specificity of the media shifts
+    - {preset: prescient,     seeds: [0, 1, 2]}
+    - {preset: v2_meanfield,  seeds: [0, 1, 2]}
+    - {preset: ctrl_shuffled, seeds: [0, 1, 2]}
+    - {preset: ctrl_random,   seeds: [0, 1, 2]}
   tier2:          # leave-one-condition-out (train on 4 media, predict the 5th)
     - {preset: v2_meanfield, seeds: [0], tag: loco_Mcsf, set: ["train.conditions=[full cocktail,G-csf,Epo,SCF]"]}
     - {preset: v2_meanfield, seeds: [0], tag: loco_Gcsf, set: ["train.conditions=[full cocktail,M-csf,Epo,SCF]"]}
