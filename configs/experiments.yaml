@@ -44,9 +44,11 @@ cytokine:
 
 neural_tube:
   config: neural_tube.yaml
-  tier1:
-    - {preset: prescient,    seeds: [0, 1]}
-    - {preset: v2_meanfield, seeds: [0, 1, 2]}
+  tier1:          # same controls as Weinreb and cytokine, so all three datasets are tested alike
+    - {preset: prescient,     seeds: [0, 1, 2]}
+    - {preset: v2_meanfield,  seeds: [0, 1, 2]}
+    - {preset: ctrl_shuffled, seeds: [0, 1]}
+    - {preset: ctrl_random,   seeds: [0, 1]}
   tier2:
     - {preset: ctrl_off,     seeds: [0, 1]}
     - {preset: prescient,    seeds: [0], tag: holdlast, set: ["train.holdout_times=[LAST]"]}

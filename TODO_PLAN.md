@@ -106,6 +106,15 @@ statistically sound and is what the reviewers asked for ("more evaluation indexe
       also fits composition → specificity not shown yet. Added ctrl_shuffled/ctrl_random ×3 to cytokine
       tier 1, scripts/14_cytokine_shifts.py; F1 now sets earlier cytokine runs aside.
       **Next version: `STAGE = 'G2+F1+F2'` (attach THIS version).**
+- [x] 4.5 `G1+F1+F2` (GPU, corrected cocktail incl. IL-11/IL-5; 18 runs). Day-6 composition L1 (mean over
+      seeds): PRESCIENT Epo 1.48 / G-CSF 0.73 / M-CSF 1.16 / cocktail 0.44; v2 0.23 / 0.22 / 0.06 / 0.33;
+      ctrl_shuffled 0.13 / 0.13 / 0.09 / 0.14; ctrl_random 0.12 / 0.10 / 0.15 / 0.21. Clone-matched shifts
+      (14_cytokine_shifts): G-CSF→M-CSF obs −0.19, pred v2 −0.51 / shuffled −0.71 / random −0.66, per-cell r
+      0.09 / 0.10 / 0.13; Epo→M-CSF obs −0.18, pred −0.38 / −0.33 / −0.34, r 0.26 / 0.35 / 0.34. Held-out
+      medium fails for every model. Within-medium progenitor PCC: PRESCIENT best in Epo/SCF/M-CSF.
+      **Conclusion: the media effects are learned from knowing the medium; real LR pairs add nothing
+      over shuffled or random genes. LR specificity is not supported on any dataset.**
+      Neural-tube tier 1 now includes ctrl_shuffled/ctrl_random. **Next version: `STAGE = 'G2'`.**
 - [ ] 5.1 STAGE `G1` first, then send me `work/neural_tube/inspect.txt`. I need to confirm the time and
       cell-type columns (or the marker annotation) before training.
 - [ ] 5.2 STAGE `G2`: LIANA → build → tier1 (5 runs) → evaluate → `--analyze`.
